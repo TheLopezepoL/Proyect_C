@@ -187,20 +187,29 @@ public class HeroBehaviour : MonoBehaviour
 
     public void Attack()
     {
-        Collider2D[] enemiesHit = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
+        Collider2D[] enemiesHit = Physics2D.OverlapCircleAll(attackPoint.position, attackRange);
 
         foreach(Collider2D enemy in enemiesHit)
         {
-            Debug.Log("enemy hit boi");
             GameObject enemyObject = enemy.gameObject;
-            BringerOfDeath bringerOfDeath = enemy.gameObject.GetComponent<BringerOfDeath>();
             if(enemyObject.tag=="BringerOfDeath")
             {
-                if (bringerOfDeath.alive == true)
+                BringerOfDeath enemyComponent = enemy.gameObject.GetComponent<BringerOfDeath>();
+                if (enemyComponent.alive && enemyComponent.stunned && !enemyComponent.teleporting)
                 {
                     Animator animator = enemy.GetComponent<Animator>();
                     animator.SetTrigger("Hurt");
-                    bringerOfDeath.health--;
+                    enemyComponent.health--;
+                }
+            }
+            if (enemyObject.tag == "Shield")
+            {
+                ShieldBehaviour enemyComponent = enemy.gameObject.GetComponent<ShieldBehaviour>();
+                if (!enemyComponent.disabled)
+                {
+                    Animator animator = enemy.GetComponent<Animator>();
+                    animator.SetTrigger("Hit");
+                    enemyComponent.health--;
                 }
             }
         }
